@@ -3,7 +3,6 @@
 require 'drb/drb'
 require 'fileutils'
 require 'rufus-scheduler'
-require_relative './daemon/version'
 
 module Rufus
   class Daemon
