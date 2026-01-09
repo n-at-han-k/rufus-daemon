@@ -6,7 +6,7 @@ require 'rufus-scheduler'
 
 module Rufus
   class Daemon
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
 
     SOCKET_DIR = "/tmp/drb-sockets"
     SOCKET_FILE = SOCKET_DIR + "/rufus.sock"
