@@ -1,0 +1,122 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require_relative '../lib/rufus/daemon'
+
+#def install
+#  # install systemd service
+#  #
+#  File.write 'filename', <<~SERVICE
+#    what ever goes in a service file
+#  SERVICE
+#end
+
+SCHEDULE_FILE = File.expand_path("~/rufus.rb")
+SCHEDULE_DIR = File.expand_path("~/.rufus")
+
+# Your schedule file can look like this:
+#
+#   every '10s' do
+#     puts "hello"
+#   end
+#   
+#   cron '0 9 * * *' do
+#     puts "morning"
+#   end
+
+def start
+  Rufus::Daemon.start
+  sleep 1
+
+  if File.exist?(SCHEDULE_FILE)
+    Rufus::Daemon.attach.then do |daemon|
+      if daemon.jobs.empty?
+        daemon.load_schedule(SCHEDULE_FILE)
+      end
+    end
+  end
+
+  if Dir.exist?(SCHEDULE_DIR)
+    Rufus::Daemon.attach.then do |daemon|
+      if daemon.jobs.empty?
+        Dir.glob("#{SCHEDULE_DIR}/**/*.rb").each do |file|
+          daemon.load_schedule(file)
+        end
+      end
+    end
+  end
+rescue DRb::DRbConnError
+  puts "Failed to connect after start"
+  puts "Therefore, couldn't load schedule"
+end
+
+def stop
+  Rufus::Daemon.stop
+end
+
+def restart
+  stop
+  sleep 1
+  start
+end
+
+def status
+  Rufus::Daemon.attach.rufus.then do |rufus|
+    puts "Total jobs: #{rufus.jobs.count}"
+  end
+rescue DRb::DRbConnError => e
+  puts "Not started"
+  puts e
+end
+
+def list
+  Rufus::Daemon.attach.then do |rufus|
+    if rufus.jobs.any?
+      rufus.jobs.each do |job|
+        puts job
+      end
+    else
+      puts "No jobs"
+    end
+  end
+rescue DRb::DRbConnError => e
+  puts "Not started"
+  puts e
+end
+
+OptionParser.new.instance_exec do
+  banner = 'Usage: rufus [options]'
+
+  separator ''
+  separator 'Example: rufus --start'
+
+  separator ''
+  separator 'Options:'
+
+  on('--install') { install; exit }
+  on('--start')   { start;   exit }
+  on('--restart') { restart; exit }
+  on('--stop')    { stop;    exit }
+  on('--status')  { status;  exit }
+  on('--list')    { list;    exit }
+
+  separator ''
+  separator 'Help options:'
+
+  on('--help') { puts self; exit }
+
+  if ARGV.empty?
+    puts self
+  else
+    case ARGV.first.to_sym
+    when :start   then start
+    when :restart then restart
+    when :stop    then stop
+    when :status  then status
+    when :list    then list
+    when :help    then puts self
+    else
+      parse!
+    end
+  end
+end
