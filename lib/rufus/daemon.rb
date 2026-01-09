@@ -7,6 +7,8 @@ require_relative './daemon/version'
 
 module Rufus
   class Daemon
+    VERSION = "1.0.0"
+
     SOCKET_DIR = "/tmp/drb-sockets"
     SOCKET_FILE = SOCKET_DIR + "/rufus.sock"
     SOCKET_URI = "drbunix://#{SOCKET_FILE}"

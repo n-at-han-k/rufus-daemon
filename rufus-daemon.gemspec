@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "lib/rufus-daemon/version"
+require_relative "lib/rufus/daemon"
 
 Gem::Specification.new do |spec|
   spec.name = "rufus-daemon"
