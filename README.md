@@ -1,7 +1,15 @@
 # rufus-daemon
 
-tbc...
+Run a rufus-scheduler daemon in the background, with access to the instance over DRb unix socket.
+Lovingly built to prevent hanging processes.
 
+## Why?
+1. Get status updates on your jobs
+2. Build a job querying service
+3. Allow other processes to schedule jobs
+4. Dynamic scheduling of jobs.
+5. ???
+6. Profit
 
 ## Install
 ```ruby
@@ -9,30 +17,42 @@ gem install rufus-daemon
 ```
 
 ## Usage
+Running the command line.
 ```bash
-tbc...
+$ rufus --help
+Usage: rufus [options]
+
+Example: rufus --start
+
+Options:
+        --start
+        --restart
+        --stop
+        --status
+        --list
+
+Help options:
+        --help
 ```
 
+Accessing the rufus instance over DRb socket
+```ruby
+require 'rufus/daemon'
+
+Rufus::Daemon.attach.then do |service|
+  puts service.rufus # the rufus-scheduler instance
+
+  # .jobs is a helper that deserializes the jobs before sending
+  # over DRb socket. Otherwise you get a marshalling error.
+  service.jobs.each do |job|
+    puts job
+  end
+end
+```
 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub.
-
-## Development
-
-After checking out the repo:
-
-```bash
-bin/setup
-bundle exec rake test
-```
-
-Generate documentation:
-
-```bash
-bundle exec yard doc
-bundle exec yard server  # Browse at http://localhost:8808
-```
 
 ## License
 
