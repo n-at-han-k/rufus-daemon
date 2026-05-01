@@ -1,5 +1,7 @@
 # rufus-daemon
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/n-at-han-k/rufus-daemon)
+
 Run a rufus-scheduler daemon in the background, with access to the instance over DRb unix socket.
 Lovingly built to prevent hanging processes.
 
